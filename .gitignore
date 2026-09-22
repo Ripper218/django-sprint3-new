@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 static/
-blogicum/static-dev/
+static-dev/
 html/
 
 # Distribution / packaging
