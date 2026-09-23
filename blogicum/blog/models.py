@@ -1,12 +1,12 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from .const import MAX_LENGTH_TITLE
+from .consts import MAX_LENGTH_CHAR, MAX_LENGTH_SLUG
 
 User = get_user_model()
 
 
-class BaseClass(models.Model):
+class IsPublishedCreatedAt(models.Model):
     is_published = models.BooleanField(
         default=True,
         verbose_name='Опубликовано',
@@ -19,17 +19,17 @@ class BaseClass(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ['created_at']
+        ordering = ('created_at')
 
 
-class Category(BaseClass):
+class Category(IsPublishedCreatedAt):
     title = models.CharField(
-        max_length=MAX_LENGTH_TITLE,
+        max_length=MAX_LENGTH_CHAR,
         verbose_name='Заголовок'
     )
     description = models.TextField('Описание')
     slug = models.SlugField(
-        max_length=64,
+        max_length=MAX_LENGTH_SLUG,
         unique=True,
         verbose_name='Идентификатор',
         help_text=(
@@ -44,12 +44,12 @@ class Category(BaseClass):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title
+        return self.title[:20]
 
 
-class Location(BaseClass):
+class Location(IsPublishedCreatedAt):
     name = models.CharField(
-        max_length=MAX_LENGTH_TITLE,
+        max_length=MAX_LENGTH_CHAR,
         verbose_name='Название места'
     )
 
@@ -58,12 +58,12 @@ class Location(BaseClass):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name
+        return self.name[:20]
 
 
-class Post(BaseClass):
+class Post(IsPublishedCreatedAt):
     title = models.CharField(
-        max_length=MAX_LENGTH_TITLE,
+        max_length=MAX_LENGTH_CHAR,
         verbose_name='Заголовок'
     )
     text = models.TextField(verbose_name='Текст')
@@ -97,6 +97,7 @@ class Post(BaseClass):
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
         default_related_name = 'posts'
+        ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.title
+        return self.title[:20]

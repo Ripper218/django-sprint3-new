@@ -1,59 +1,48 @@
-from django.shortcuts import render, get_object_or_404
-from blog.models import Post, Category
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
+
+from .models import Category, Post
+from .consts import HOME_PAGE_POSTS_COUNT
+
+
+def prepare_posts(queryset):
+
+    return queryset.filter(
+        is_published=True,
+        pub_date__lte=timezone.now()
+    ).select_related(
+        'author',
+        'location',
+        'category'
+    )
 
 
 def index(request):
-    template = 'blog/index.html'
-    post_list = (
-        Post.objects.select_related(
-            'location',
-            'author',
-            'category'
-        ).filter(
-            is_published=True,
-            pub_date__lte=timezone.now(),
-            category__is_published=True
-        ).order_by('-pub_date')[:5]
-    )
-    context = {'post_list': post_list}
-    return render(request, template, context)
+    post_list = prepare_posts(
+        Post.objects.all().filter(category__is_published=True)
+    )[:HOME_PAGE_POSTS_COUNT]
+
+    return render(request, 'blog/index.html', {'post_list': post_list})
 
 
 def post_detail(request, id):
-    template = 'blog/detail.html'
     post = get_object_or_404(
-        Post,
+        prepare_posts(Post.objects.all()),
         pk=id,
-        is_published=True,
-        pub_date__lte=timezone.now(),
         category__is_published=True
     )
-    context = {'post': post}
-    return render(request, template, context)
+    return render(request, 'blog/detail.html', {'post': post})
 
 
 def category_posts(request, category_slug):
-    template = 'blog/category.html'
-
     category = get_object_or_404(
         Category,
         slug=category_slug,
         is_published=True
     )
-    post_list = (
-        Post.objects.select_related(
-            'location',
-            'author',
-            'category'
-        ).filter(
-            is_published=True,
-            pub_date__lte=timezone.now(),
-            category=category
-        )
-    )
-    context = {
+    post_list = prepare_posts(category.posts.all())
+
+    return render(request, 'blog/category.html', {
         'category': category,
         'post_list': post_list
-    }
-    return render(request, template, context)
+    })
