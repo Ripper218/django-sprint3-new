@@ -5,7 +5,7 @@ from .models import Category, Post
 from .consts import HOME_PAGE_POSTS_COUNT
 
 
-def filter_posts(queryset):
+def filtering_posts_by_publication(queryset):
 
     return queryset.filter(
         is_published=True,
@@ -19,7 +19,7 @@ def filter_posts(queryset):
 
 
 def index(request):
-    post_list = filter_posts(
+    post_list = filtering_posts_by_publication(
         Post.objects.all()
     )[:HOME_PAGE_POSTS_COUNT]
 
@@ -28,7 +28,7 @@ def index(request):
 
 def post_detail(request, id):
     post = get_object_or_404(
-        filter_posts(Post.objects.all()),
+        filtering_posts_by_publication(Post.objects.all()),
         pk=id
     )
     return render(request, 'blog/detail.html', {'post': post})
@@ -40,7 +40,7 @@ def category_posts(request, category_slug):
         slug=category_slug,
         is_published=True
     )
-    post_list = filter_posts(category.posts.all())
+    post_list = filtering_posts_by_publication(category.posts.all())
 
     return render(request, 'blog/category.html', {
         'category': category,

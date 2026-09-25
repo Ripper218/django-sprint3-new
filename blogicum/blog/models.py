@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from .consts import CHARACTER_SLICE, MAX_LENGTH_CHAR, MAX_LENGTH_SLUG
+from .consts import SLICE_OUTPUT_STR_METHOD, MAX_LENGTH_CHAR, MAX_LENGTH_SLUG
 
 User = get_user_model()
 
@@ -44,7 +44,7 @@ class Category(IsPublishedCreatedAt):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title[:CHARACTER_SLICE]
+        return self.title[:SLICE_OUTPUT_STR_METHOD]
 
 
 class Location(IsPublishedCreatedAt):
@@ -58,7 +58,7 @@ class Location(IsPublishedCreatedAt):
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name[:CHARACTER_SLICE]
+        return self.name[:SLICE_OUTPUT_STR_METHOD]
 
 
 class Post(IsPublishedCreatedAt):
@@ -100,4 +100,4 @@ class Post(IsPublishedCreatedAt):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.title[:CHARACTER_SLICE]
+        return self.title[:SLICE_OUTPUT_STR_METHOD]
